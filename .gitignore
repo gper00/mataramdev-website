@@ -22,10 +22,17 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+
+# editors
+.idea/
+.vscode/
 
 # local tooling state (symlink to ~/.omo/codegraph) — breaks Turbopack's CSS loader if scanned
 .codegraph/
+# agent session state written next to the project by local tooling
+.omo/
 
 # debug
 npm-debug.log*
