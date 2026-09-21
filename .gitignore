@@ -29,6 +29,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# design mockups kept next to the project for reference, not part of the repo
+ui_design_canva/
+
 # local tooling state (symlink to ~/.omo/codegraph) — breaks Turbopack's CSS loader if scanned
 .codegraph/
 # agent session state written next to the project by local tooling
