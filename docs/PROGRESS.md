@@ -105,6 +105,14 @@
     - Kolom baru `projects.created_by` (NOT NULL, FK → users): `createProject` membaca balik barisnya dengan `.select("id")` dan baris `RETURNING` wajib lolos policy SELECT — tanpa kolom ini submit proyek selalu gagal di bawah RLS. `WITH CHECK (created_by = auth.uid())` sekaligus menutup celah kontributor masuk ke proyek pending orang lain.
     - Penghitung unduhan pindah ke RPC `increment_download_count()` (SECURITY DEFINER) karena anon memang tidak diberi UPDATE di `free_resources`.
     - Diuji langsung terhadap database asli: signup → trigger terisi, penolakan anon/member (events, stacks, kolom email, proyek asing), rantai submit proyek→contributor→stack, flip moderasi pending→approved terlihat anon, upload/ditolak di storage, unduhan 302 dengan counter 0→2, smoke semua route. Data tes sudah dibersihkan; akun admin pertama sudah ada.
+- [x] **Phase 6: Verifikasi putaran kedua + isi konten awal** ✅
+    - Tabel `stacks` diisi 18 entri lewat jalur tulis yang sama dengan `/admin/stack` (admin 201, member 403) — form submit proyek tidak lagi kosong.
+    - RSVP diuji penuh dan terlihat di halaman publik: detail event merender "1 orang sudah daftar" dari row asli; membatalkan menurunkan hitungan jadi 0, daftar ulang menaikkannya kembali; member lain 0 baris tersentuh; anon ditolak.
+    - Artikel diuji penuh: draf tak terlihat anon, terbaca pemiliknya, `publishPost` membuatnya tampil di `/artikel`.
+    - Urutan FAQ diuji dua lapis: sebagai fungsi murni (`src/lib/faq.ts`, 9 pemeriksaan lewat `node --experimental-strip-types`) dan terhadap DB asli — angka yang sengaja dirusak jadi `[5, 5, NULL]` kembali menjadi `0, 1, 2`, lalu hapus baris tengah tetap menyisakan `0, 1` tanpa gap.
+    - CRUD admin diuji lewat jalur server action: stack (termasuk hapus stack yang sedang dipakai — lepas `project_stacks` 204, hapus stack 204), event (edit + ganti status), FAQ (tambah/edit/hapus/urutan). Semua penolakan non-admin tercatat 403/42501 atau 0 baris.
+    - Halaman publik dirender sungguhan (`pnpm start` + data nyata): `/event`, `/event?status=upcoming`, detail event (judul + jumlah peserta), `/artikel`, detail artikel, `/faq`. Log server bersih.
+    - Data percobaan dibersihkan: DB kembali ke 13 tabel, 1 akun admin, 18 stack, 0 event/rsvp/artikel/proyek/FAQ, dan 4 bucket storage 0 objek.
 - **Auth**: Focusing on urgent needs first (Email/Password), ignoring non-urgent OAuth for now.
 - **ORM**: Drizzle ORM is the final choice for type-safety and migrations.
 - **Styling**: Tailwind CSS 4.x with a focus on Bento Grid layouts.
